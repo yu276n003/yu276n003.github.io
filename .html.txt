@@ -2,201 +2,39 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>終極幸運大抽籤 Pro</title>
-    <!-- 引入免費的五彩紙屑特效庫 -->
-    <script src="https://jsdelivr.net"></script>
+    <title>簡單抽籤</title>
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #f6d365, #fda085);
-            --primary-color: #ff6b6b;
-            --primary-hover: #fa5252;
-        }
-        body {
-            font-family: 'Microsoft JhengHei', sans-serif;
-            background: var(--bg-gradient);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            color: #333;
-            transition: background 0.5s ease;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            position: relative;
-        }
-        h1 {
-            color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 20px;
-            transition: color 0.5s ease;
-        }
-        textarea {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 1rem;
-            resize: none;
-            box-sizing: border-box;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        textarea:focus {
-            border-color: var(--primary-color);
-        }
-        .mode-box {
-            margin: 10px 0;
-            font-size: 0.95rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-        .result-box {
-            background-color: #f8f9fa;
-            border: 2px dashed var(--primary-color);
-            border-radius: 10px;
-            height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 15px 0;
-            transition: border-color 0.5s, color 0.5s;
-        }
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-            transition: transform 0.1s, background-color 0.2s;
-        }
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-        button:active {
-            transform: scale(0.98);
-        }
-        .theme-selector {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .theme-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-        }
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; background: #f0f0f0; }
+        textarea { width: 300px; height: 100px; font-size: 16px; }
+        #result { font-size: 32px; font-weight: bold; color: red; margin: 20px; }
+        button { font-size: 20px; padding: 10px 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🔮 幸運大抽籤 Pro</h1>
-        
-        <textarea id="optionsInput">便當
+    <h1>🔮 幸運抽籤</h1>
+    <textarea id="inputs">便當
 火鍋
-麥當勞
-牛肉麵
-義大利麵</textarea>
-        
-        <label class="mode-box">
-            <input type="checkbox" id="deleteMode"> 💀 啟用淘汰賽模式 (抽中就刪除)
-        </label>
-
-        <div class="result-box" id="resultDisplay">準備抽籤...</div>
-        
-        <button onclick="startDraw()">祝你好運！點我抽籤</button>
-
-        <!-- 主題切換按鈕 -->
-        <div class="theme-selector">
-            <div class="theme-dot" style="background: linear-gradient(135deg, #f6d365, #fda085);" onclick="changeTheme('orange', '#ff6b6b', '#fa5252', 'linear-gradient(135deg, #f6d365, #fda085)')"></div>
-            <div class="theme-dot" style="background: linear-gradient(135deg, #71b7e6, #9b59b6);" onclick="changeTheme('purple', '#9b59b6', '#8e44ad', 'linear-gradient(135deg, #71b7e6, #9b59b6)')"></div>
-            <div class="theme-dot" style="background: linear-gradient(135deg, #ff9a9e, #fecfef);" onclick="changeTheme('pink', '#ff7675', '#d63031', 'linear-gradient(135deg, #ff9a9e, #fecfef)')"></div>
-        </div>
-    </div>
+麥當勞</textarea>
+    
+    <div id="result">準備抽籤...</div>
+    <button onclick="draw()">點我抽籤</button>
 
     <script>
-        let isDrawing = false;
-
-        function startDraw() {
-            if (isDrawing) return;
-
-            const inputEl = document.getElementById('optionsInput');
-            // 讀取目前的選項並過濾空行
-            let options = inputEl.value.split('\n').map(opt => opt.trim()).filter(opt => opt !== "");
-
-            if (options.length === 0) {
-                alert("名單已經空了！請重新輸入選項。");
+        function draw() {
+            // 讀取文字，用換行分開，並過濾掉空白
+            let list = document.getElementById('inputs').value.split('\n').filter(x => x.trim() !== "");
+            
+            if (list.length === 0) {
+                alert("請輸入選項！");
                 return;
             }
-
-            isDrawing = true;
-            const resultDisplay = document.getElementById('resultDisplay');
-            let counter = 0;
-            let finalSelectedIndex = 0;
             
-            // 跑馬燈跳動效果
-            const interval = setInterval(() => {
-                const randomIndex = Math.floor(Math.random() * options.length);
-                resultDisplay.innerText = options[randomIndex];
-                counter++;
-                
-                if (counter > 15) {
-                    clearInterval(interval);
-                    
-                    // 決定最終中獎者
-                    finalSelectedIndex = Math.floor(Math.random() * options.length);
-                    const winner = options[finalSelectedIndex];
-                    
-                    resultDisplay.innerText = "🎉 " + winner;
-
-                    // 觸發全螢幕彩帶特效
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
-
-                    // 如果開啟淘汰賽模式，將該選項移除
-                    if (document.getElementById('deleteMode').checked) {
-                        options.splice(finalSelectedIndex, 1);
-                        inputEl.value = options.join('\n'); // 更新文字框內容
-                    }
-
-                    isDrawing = false;
-                }
-            }, 100);
-        }
-
-        // 動態切換網頁配色主題
-        function changeTheme(name, primary, hover, gradient) {
-            document.documentElement.style.setProperty('--bg-gradient', gradient);
-            document.documentElement.style.setProperty('--primary-color', primary);
-            document.documentElement.style.setProperty('--primary-hover', hover);
+            // 隨機選一個
+            let randomIndex = Math.floor(Math.random() * list.length);
+            document.getElementById('result').innerText = "🎉 " + list[randomIndex];
         }
     </script>
+
 </body>
 </html>
