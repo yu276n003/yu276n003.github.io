@@ -12,7 +12,7 @@
 </head>
 <body>
 
-    <h1>🔮 幸運抽籤</h1>
+    <h1>幸運抽籤</h1>
     <textarea id="inputs">便當
 火鍋
 麥當勞</textarea>
@@ -21,8 +21,7 @@
     <button onclick="draw()">點我抽籤</button>
 
     <script>
-        function draw() {
-            // 讀取文字，用換行分開，並過濾掉空白
+        function draw() 
             let list = document.getElementById('inputs').value.split('\n').filter(x => x.trim() !== "");
             
             if (list.length === 0) {
